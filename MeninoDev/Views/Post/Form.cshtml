@@ -1,0 +1,33 @@
+﻿@model MeninoDev.Entidades.Post
+
+@{
+    ViewData["Title"] = "Novo";
+}
+
+<h4>Post</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        @using (Html.BeginForm("Form", "Post", FormMethod.Post))
+        {
+            <div class="form-group">
+                @Html.DisplayNameFor(model => model.Title)
+                @Html.EditorFor(model => model.Title)
+                @Html.ValidationMessageFor(model => model.Title)
+            </div>
+            <div class="form-group">
+                @Html.DisplayNameFor(model => model.Content)
+                @Html.EditorFor(model => model.Content)
+                @Html.ValidationMessageFor(model => model.Content)
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Adicionar" class="btn btn-primary" />
+            </div>
+        }
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Voltar</a>
+</div>
