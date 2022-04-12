@@ -31,8 +31,20 @@ namespace MeninoDev.Controllers
             return View(posts);
         }
 
-        public IActionResult Form()
+        public IActionResult Form(long Id)
         {
+            if (Id > 0)
+            {
+                using (IDbConnection db = new SqlConnection(_connectionString))
+                {
+                    var sql = "SELECT * FROM POST WHERE Id = @PostId";
+
+                    var Post = db.QueryFirstOrDefault<Post>(sql, new { PostId = Id });
+
+                    return View(Post);
+                }
+            }
+
             return View();
         }
 
@@ -41,21 +53,45 @@ namespace MeninoDev.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Error = "Dados Inválidos!";
+                TempData["Error"] = "Dados Inválidos!";
                 return View();
             }
-            
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                var sql = @"INSERT POST (Date, Title, Content) OUTPUT INSERTED.* VALUES (@Date, @Title, @Content)";
-                post.Date = DateTime.Today;
 
-                var retorno = db.QuerySingle<Post>(sql, new
+            if (post.Id > 0)
+            {
+                using (IDbConnection db = new SqlConnection(_connectionString))
                 {
-                    post.Date,
-                    post.Title,
-                    post.Content
-                });
+                    var sql = @"UPDATE POST SET Date = @Date, Title = @Title, Content = @Content OUTPUT INSERTED.* WHERE Id = @Id";
+                    post.Date = DateTime.Today;
+
+                    var retorno = db.QuerySingle<Post>(sql, new
+                    {
+                        post.Date,
+                        post.Title,
+                        post.Content,
+                        post.Id
+                    });
+                }
+
+                TempData["Sucesso"] = "Post atualizado!";
+            }
+            else
+            {
+
+                using (IDbConnection db = new SqlConnection(_connectionString))
+                {
+                    var sql = @"INSERT POST (Date, Title, Content) OUTPUT INSERTED.* VALUES (@Date, @Title, @Content)";
+                    post.Date = DateTime.Today;
+
+                    var retorno = db.QuerySingle<Post>(sql, new
+                    {
+                        post.Date,
+                        post.Title,
+                        post.Content
+                    });
+                }
+
+                TempData["Sucesso"] = "Post salvo com sucesso!";
             }
 
             return RedirectToAction("Index");
