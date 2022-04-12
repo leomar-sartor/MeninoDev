@@ -96,5 +96,20 @@ namespace MeninoDev.Controllers
 
             return RedirectToAction("Index");
         }
+
+        public ActionResult Delete(long Id)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                var sql = "DELETE FROM POST WHERE Id = @PostId";
+
+                db.Query(sql, new { PostId = Id });
+            }
+
+            TempData["Exclusao"] = "Post removido com sucesso!";
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
