@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<MeninoDev.Entidades.Post>
+
+@{
     ViewData["Title"] = "Posts";
 }
 
@@ -6,7 +8,41 @@
     @Html.ActionLink("Novo", "Form", "Post")
 </p>
 
-<div class="text-center">
-    <h1 class="display-4">Hello my first application</h1>
-    <p>Congratulations for you!</p>
-</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Content)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Content)
+                </td>
+                <td>
+                    @Html.ActionLink("Editar", "Edit", "Ativo", new { Area = "Administrador", Id = @item.Id })  |
+                    @Html.ActionLink("Detalhes", "Details", "Ativo", new { Area = "Administrador", Id = @item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", "Ativo", new { Area = "Administrador", Id = @item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

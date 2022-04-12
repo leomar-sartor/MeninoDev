@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System.Data;
 using Dapper;
 using System;
+using System.Collections.Generic;
 
 namespace MeninoDev.Controllers
 {
@@ -19,7 +20,15 @@ namespace MeninoDev.Controllers
         }
         public IActionResult Index()
         {
-            return View();
+            IEnumerable<Post> posts;
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                var sql = "SELECT * FROM POST";
+                posts = db.Query<Post>(sql);
+            }
+
+            return View(posts);
         }
 
         public IActionResult Form()
