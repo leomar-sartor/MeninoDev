@@ -5,7 +5,7 @@
 }
 
 @{
-    
+
     if (TempData["Sucesso"] != null)
     {
         <div class="alert alert-success">
@@ -29,43 +29,28 @@
 }
 
 <p>
-    @Html.ActionLink("Novo", "Form", "Post")
+    @Html.ActionLink("Novo", "Form", "Post", null, new { @class = "btn btn-primary btn-large" })
 </p>
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Date)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Content)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Date)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Content)
-                </td>
-                <td>
-                    @Html.ActionLink("Editar", "Form", "Post", new { Id = @item.Id })  |
-                    @Html.ActionLink("Delete", "Delete", "Post", new { Id = @item.Id })
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@foreach (var item in Model.OrderByDescending(m => m.Id))
+{
+    <div class="row mb-2">
+        <div class="col-md-12">
+            <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                <div class="col p-4 d-flex flex-column position-static">
+                    <strong class="d-inline-block mb-2 text-primary">Categoria</strong>
+                    <h3 class="mb-0">
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </h3>
+                    <div class="mb-1 text-muted">
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </div>
+                    <p class="card-text mb-auto">
+                        @Html.DisplayFor(modelItem => item.Content)
+                    </p>
+                    <a href="#" class="stretched-link">Continue reading</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
