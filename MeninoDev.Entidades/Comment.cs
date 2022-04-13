@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace MeninoDev.Entidades
 {
-    public class Coment
+    public class Comment
     {
         public long Id { get; set; }
+        public long PostId { get; set; }
+
+        public DateTime Date { get; set; }
         public string Content { get; set; }
     }
 }
+
+

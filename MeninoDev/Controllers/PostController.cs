@@ -6,6 +6,7 @@ using System.Data;
 using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MeninoDev.Controllers
 {
@@ -37,9 +38,8 @@ namespace MeninoDev.Controllers
             {
                 using (IDbConnection db = new SqlConnection(_connectionString))
                 {
-                    var sql = "SELECT * FROM POST WHERE Id = @PostId";
-
-                    var Post = db.QueryFirstOrDefault<Post>(sql, new { PostId = Id });
+                    var sqlPost = "SELECT * FROM POST WHERE Id = @PostId";
+                    var Post = db.QueryFirstOrDefault<Post>(sqlPost, new { PostId = Id });
 
                     return View(Post);
                 }
@@ -114,11 +114,14 @@ namespace MeninoDev.Controllers
 
         public IActionResult Read(long Id)
         {
+
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                var sql = "SELECT * FROM POST WHERE Id = @PostId";
+                var sqlPost = "SELECT * FROM POST WHERE Id = @PostId";
+                var Post = db.QueryFirstOrDefault<Post>(sqlPost, new { PostId = Id });
 
-                var Post = db.QueryFirstOrDefault<Post>(sql, new { PostId = Id });
+                var sqlComments = "SELECT * FROM COMMENT WHERE PostId = @PostId";
+                Post.Comments = db.Query<Comment>(sqlComments, new { PostId = Id }).ToList();
 
                 return View(Post);
             }
