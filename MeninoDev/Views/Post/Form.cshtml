@@ -8,7 +8,7 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
         @using (Html.BeginForm("Form", "Post", FormMethod.Post))
         {
             <div class="form-group">
@@ -17,9 +17,12 @@
                 @Html.ValidationMessageFor(model => model.Title)
             </div>
             <div class="form-group">
-                @Html.DisplayNameFor(model => model.Content)
-                @Html.EditorFor(model => model.Content)
-                @Html.ValidationMessageFor(model => model.Content)
+                @*@Html.DisplayNameFor(model => model.Content)
+                    @Html.EditorFor(model => model.Content)
+                    @Html.ValidationMessageFor(model => model.Content)*@
+
+                @Html.TextAreaFor(m => m.Content, new { rows = "20", style = "resize:none;width:400px;", placeholder = Html.DisplayNameFor(m => m.Content), @class = "form-control input-lg textarea-editor" })
+
             </div>
             <div class="form-group">
                 <input type="submit" value="Adicionar" class="btn btn-primary" />
@@ -31,3 +34,15 @@
 <div>
     @Html.ActionLink("Voltar", "Index", "Post", null, new { @class = "btn btn-primary btn-large" })
 </div>
+
+@*https://summernote.org/getting-started/#simple-example*@
+@section Scripts
+{
+    <script>
+        $(document).ready(function() {
+
+            console.log("Carregou");
+            $('#Content').summernote();
+        });
+    </script>
+}
