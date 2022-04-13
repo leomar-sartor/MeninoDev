@@ -111,5 +111,18 @@ namespace MeninoDev.Controllers
             return RedirectToAction("Index");
         }
 
+
+        public IActionResult Read(long Id)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                var sql = "SELECT * FROM POST WHERE Id = @PostId";
+
+                var Post = db.QueryFirstOrDefault<Post>(sql, new { PostId = Id });
+
+                return View(Post);
+            }
+        }
+
     }
 }

@@ -1,0 +1,24 @@
+﻿@model MeninoDev.Entidades.Post
+
+@{
+    ViewData["Title"] = "Leitura";
+}
+
+<h4>Read</h4>
+<hr />
+
+
+<article class="blog-post">
+    <h2 class="blog-post-title">
+        @Model.Title
+    </h2>
+
+    <p class="blog-post-meta">
+        @Model.Date
+    </p>
+
+    <p>@Model.Content</p>
+
+</article>
+
+@Html.ActionLink("Voltar", "Index",    "Post", null, "", @Model.Id.ToString(), null, new { @class = "btn btn-primary btn-large"})
