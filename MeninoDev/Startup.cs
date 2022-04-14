@@ -1,6 +1,9 @@
+using MeninoDev.Contexto;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +27,18 @@ namespace MeninoDev
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            services.AddIdentity<UserApp, IdentityRole>
+                (options =>
+                {
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequiredUniqueChars = 3;
+                    options.Password.RequireNonAlphanumeric = false;
+                }).AddEntityFrameworkStores<Context>();
+
+            services.AddDbContext<Context>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("database")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +59,7 @@ namespace MeninoDev
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
