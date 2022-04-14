@@ -26,19 +26,29 @@ namespace MeninoDev
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-
-            services.AddIdentity<UserApp, IdentityRole>
-                (options =>
-                {
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequiredUniqueChars = 3;
-                    options.Password.RequireNonAlphanumeric = false;
-                }).AddEntityFrameworkStores<Context>();
-
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("database")));
+
+            services.AddDefaultIdentity<UserApp>
+               (options =>
+               {
+                   //options.SignIn.RequireConfirmedAccount = true;
+                   options.Password.RequiredLength = 6;
+                   options.Password.RequiredUniqueChars = 3;
+                   options.Password.RequireNonAlphanumeric = false;
+               }).AddEntityFrameworkStores<Context>();
+
+            services.AddControllersWithViews();
+
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    IConfigurationSection googleAuthNSection =
+                        Configuration.GetSection("Authentication:Google");
+                    options.ClientId = googleAuthNSection["ClientId"];
+                    options.ClientSecret = googleAuthNSection["ClientSecret"];
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,6 +77,7 @@ namespace MeninoDev
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
         }
     }
