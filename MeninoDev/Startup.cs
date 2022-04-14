@@ -48,7 +48,46 @@ namespace MeninoDev
                         Configuration.GetSection("Authentication:Google");
                     options.ClientId = googleAuthNSection["ClientId"];
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
-                });
+                })
+                .AddFacebook(opt =>
+                {
+                    IConfigurationSection googleAuthNSection =
+                        Configuration.GetSection("Authentication:Facebook");
+                    opt.ClientId = googleAuthNSection["AppId"];
+                    opt.ClientSecret = googleAuthNSection["AppSecret"];
+                })
+                .AddMicrosoftAccount(microsoftOptions =>
+                {
+                    IConfigurationSection googleAuthMsft =
+                        Configuration.GetSection("Authentication:Microsoft");
+                    microsoftOptions.ClientId = googleAuthMsft["AppId"];
+                    microsoftOptions.ClientSecret = googleAuthMsft["AppSecret"];
+                })
+               .AddTwitter(twitterOptions =>
+               {
+                   IConfigurationSection googleAuthTwt =
+                        Configuration.GetSection("Authentication:Twiter");
+                   twitterOptions.ConsumerKey = googleAuthTwt["AppId"];
+                   twitterOptions.ConsumerSecret = googleAuthTwt["AppSecret"];
+                   twitterOptions.RetrieveUserDetails = true;
+               });
+
+            //.AddFacebook(facebookOptions =>
+            //{
+            //    facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+            //    facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+            //    facebookOptions.Events = new OAuthEvents()
+            //    {
+            //        OnRemoteFailure = loginFailureHandler =>
+            //        {
+            //            var authProperties = facebookOptions.StateDataFormat.Unprotect(loginFailureHandler.Request.Query["state"]);
+            //            loginFailureHandler.Response.Redirect("/Identity/Account/Login");
+            //            loginFailureHandler.HandleResponse();
+            //            return Task.FromResult(0);
+            //        }
+            //    };
+            //});
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
