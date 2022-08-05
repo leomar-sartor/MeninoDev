@@ -3,11 +3,18 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>dcfb2818-211c-4bc6-b7d4-0baf5c224a95</UserSecretsId>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Administrador\**" />
+    <Content Remove="Areas\Administrador\**" />
+    <EmbeddedResource Remove="Areas\Administrador\**" />
+    <None Remove="Areas\Administrador\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.8" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="5.0.16" />

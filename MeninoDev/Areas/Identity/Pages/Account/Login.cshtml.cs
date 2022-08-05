@@ -15,6 +15,8 @@ using Microsoft.Extensions.Logging;
 
 namespace MeninoDev.Areas.Identity.Pages.Account
 {
+    //Biblioteca de Classes Razor (RCL).
+    //RCL - Razor Class Library,
     [AllowAnonymous]
     public class LoginModel : PageModel
     {

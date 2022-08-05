@@ -32,14 +32,17 @@ namespace MeninoDev
 
             services.AddDefaultIdentity<UserApp>
                (options =>
-               {
-                   //options.SignIn.RequireConfirmedAccount = true;
-                   options.Password.RequiredLength = 6;
-                   options.Password.RequiredUniqueChars = 3;
-                   options.Password.RequireNonAlphanumeric = false;
-               }).AddEntityFrameworkStores<Context>();
+                   {
+                       //options.SignIn.RequireConfirmedAccount = true;
+                       options.Password.RequiredLength = 6;
+                       options.Password.RequiredUniqueChars = 3;
+                       options.Password.RequireNonAlphanumeric = false;
+                   })
+               .AddRoles<IdentityRole>()
+               .AddEntityFrameworkStores<Context>();
 
             services.AddControllersWithViews();
+            services.AddRazorPages();
 
             services.AddAuthentication()
                 .AddGoogle(options =>
@@ -88,6 +91,17 @@ namespace MeninoDev
             //    };
             //});
 
+            //Modificar ACESSO NEGADO
+            //services.ConfigureApplicationCookie(options =>
+            //{
+            //    options.AccessDeniedPath = new PathString("xxxx/AccessDenied");
+            //});
+
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("AdminRolePolicy", policy => policy.RequireRole("Admin"));
+            //});
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -111,13 +125,18 @@ namespace MeninoDev
             app.UseAuthentication();
             app.UseAuthorization();
 
+           
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Post}/{action=Index}/{id?}");
+
                 endpoints.MapRazorPages();
             });
+
+            //app.UseMvc();
         }
     }
 }

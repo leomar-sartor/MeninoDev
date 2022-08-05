@@ -19,8 +19,16 @@ namespace MeninoDev.Controllers
         {
             _connectionString = configuration.GetConnectionString("database");
         }
-        public IActionResult Index()
+        public IActionResult Index(string searchString, int? pageNumber = 1)
         {
+            ViewData["CurrentFilter"] = searchString;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                //students = students.Where(s => s.LastName.Contains(searchString)
+                //                       || s.FirstMidName.Contains(searchString));
+            }
+
             IEnumerable<Post> posts;
 
             using (IDbConnection db = new SqlConnection(_connectionString))
@@ -29,7 +37,12 @@ namespace MeninoDev.Controllers
                 posts = db.Query<Post>(sql);
             }
 
-            return View(posts);
+
+            int pageSize = 3;
+            var postes = PaginatedList<Post>.Create(posts.OrderByDescending(m => m.Date), pageNumber ?? 1, pageSize);
+            
+
+            return View(postes);
         }
 
         public IActionResult Form(long Id)
