@@ -38,7 +38,7 @@ namespace MeninoDev.Controllers
             }
 
 
-            int pageSize = 3;
+            int pageSize = 6;
             var postes = PaginatedList<Post>.Create(posts.OrderByDescending(m => m.Date), pageNumber ?? 1, pageSize);
             
 
@@ -68,6 +68,18 @@ namespace MeninoDev.Controllers
             {
                 TempData["Error"] = "Dados Inválidos!";
                 return View();
+            }
+
+
+            if (post.Imagem != null)
+            {
+                //string pastaFotos = Path.Combine(webHostEnvironment.WebRootPath, "Imagens");
+                //nomeUnicoArquivo = Guid.NewGuid().ToString() + "_" + model.Foto.FileName;
+                //string caminhoArquivo = Path.Combine(pastaFotos, nomeUnicoArquivo);
+                //using (var fileStream = new FileStream(caminhoArquivo, FileMode.Create))
+                //{
+                //    model.Foto.CopyTo(fileStream);
+                //}
             }
 
             if (post.Id > 0)

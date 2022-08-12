@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,7 +16,14 @@ namespace MeninoDev.Entidades
         public long Id { get; set; }
 
         public DateTime Date { get; set; }
+
+        [Required(ErrorMessage = "É necessário um título")]
+        [Display(Name = "Título")]
         public string Title { get; set; }
+
+        [Required(ErrorMessage = "É necessário uma imagem")]
+        [Display(Name = "Imagem")]
+        public IFormFile Imagem { get; set; }
 
         [AllowHtml]
         [Display(Name = "Conteúdo")]

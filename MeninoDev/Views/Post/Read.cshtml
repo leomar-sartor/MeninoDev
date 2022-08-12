@@ -12,8 +12,9 @@
 <h4>Read  @Html.ActionLink("Voltar", "Index", "Post", null, "", @Model.Id.ToString(), null, new { @class = "btn btn-primary btn-large"}) </h4>
 <hr />
 
-
-<article class="blog-post">
+@*shadow-sm -> box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+.rounded -> border-radius: 0.25rem!important;*@
+<article class="blog-post" style="overflow-wrap: break-word; padding: 10px; box-shadow: 0px 0px 4px cadetblue; border-radius: 5px; }">
     <h2 class="blog-post-title">
         @Model.Title
     </h2>
