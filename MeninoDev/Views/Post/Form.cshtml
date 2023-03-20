@@ -9,17 +9,17 @@
         @using (Html.BeginForm("Form", "Post", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <div class="row">
-                <div class="col-auto mr-auto">
-                    @Html.ActionLink("Voltar", "Index", "Post", null, new { @class = "btn btn-primary btn-large" })
+                <div class="col-6 ">
+                    @Html.ActionLink("Voltar", "Index", "Post", null, new { @class = "btn btn-sm btn-outline-primary" })
                 </div>
-                <div class="col-auto">
-                    <input type="submit" value="Adicionar" class="btn btn-primary" />
+                <div class="col-6 text-end">
+                    <input type="submit" value="Salvar" class="btn btn-sm btn-outline-success" />
                 </div>
             </div>
 
             <hr />
 
-            <div class="form-group row">
+            <div class="mb-3 row">
                 <label class="col-sm-1 col-form-label"> @Html.DisplayNameFor(model => model.Title) </label>
                 <div class="col-sm-11">
                     @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", @name = "title", @id = "title", @placeholder = "Título", @type = "text" } })
@@ -29,16 +29,26 @@
                 </div>
             </div>
 
-            <div class="form-group row">
+            <div class="mb-3 row">
+                <label class="col-sm-1 col-form-label"> @Html.DisplayNameFor(model => model.Url) </label>
+                <div class="col-sm-11">
+                    @Html.EditorFor(model => model.Url, new { htmlAttributes = new { @class = "form-control", @name = "title", @id = "title", @placeholder = "Endereço da Imagem", @type = "text" } })
+                    <small>
+                        @Html.ValidationMessageFor(model => model.Url, null, new { @class = "text-danger" })
+                    </small>
+                </div>
+            </div>
+
+           @* <div class="mb-3 row">
                 <label class="col-sm-1 col-form-label"> @Html.DisplayNameFor(model => model.Imagem) </label>
                 <div class="col-sm-11">
                     <div class="form-group custom-file">
                         <input asp-for="Imagem" class="custom-file-input" id="customFileLangHTML" lang="pt-BR" />
-                        <label class="custom-file-label" for="customFileLangHTML" data-browse="Anexar" >Escolha a imagem</label>
+                        <label class="custom-file-label" for="customFileLangHTML" data-browse="Anexar">Escolha a imagem</label>
                         <span asp-validation-for="Imagem" class="text-danger"></span>
                     </div>
                 </div>
-            </div>
+            </div>*@
 
             <div class="form-group">
                 @Html.TextAreaFor(m => m.Content, new { rows = "80", style = "resize:none;width:400px;", placeholder = Html.DisplayNameFor(m => m.Content), @class = "form-control input-lg textarea-editor" })

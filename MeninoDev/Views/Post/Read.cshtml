@@ -1,7 +1,17 @@
-﻿@model MeninoDev.Entidades.Post
+﻿@using MeninoDev.Contexto
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims;
+
+@inject SignInManager<UserApp> SignInManager
+@inject UserManager<UserApp> UserManager
+
+@model MeninoDev.Entidades.Post
 
 @{
     ViewData["Title"] = "Leitura";
+
+    var mostrar = (SignInManager.IsSignedIn(User));
+    var IdUser = User.Claims.FirstOrDefault().Value;
 }
 
 @section Styles {
@@ -9,39 +19,97 @@
 </style>
  }
 
-<h4>Read  @Html.ActionLink("Voltar", "Index", "Post", null, "", @Model.Id.ToString(), null, new { @class = "btn btn-primary btn-large"}) </h4>
-<hr />
+<div class="row">
+    <div class="col-10 text-start">
+        <h2 class="blog-post-title text-success-emphasis">
+            @Model.Title
+        </h2>
+        <p class="blog-post-meta">
+            @Model.Date.ToString("dd/MM/yyyy")
+        </p>
+    </div>
+    <div class="col-2 text-end p-2" style="">
+        @*asp-route-returnUrl="@Model.ReturnUrl"*@
+        <a class="btn btn-sm btn-outline-primary" asp-action="Index" asp-controller="post" asp-route-pageNumber="@Model.PostPage">Voltar</a>
+        @*@Html.ActionLink("Voltar", "Index", "Post", null, new { @class = "btn btn-sm btn-outline-primary" })*@
+    </div>
+</div>
 
-@*shadow-sm -> box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
-.rounded -> border-radius: 0.25rem!important;*@
-<article class="blog-post" style="overflow-wrap: break-word; padding: 10px; box-shadow: 0px 0px 4px cadetblue; border-radius: 5px; }">
-    <h2 class="blog-post-title">
-        @Model.Title
-    </h2>
+<hr class="m-0 mb-2" />
 
-    <p class="blog-post-meta">
-        @Model.Date
-    </p>
-
+<article class="blog-post">
     @Html.Raw(@Model.Content)
 </article>
 
+<hr class="m-0 mb-2" />
 
-<div class="my-3 p-3 bg-body rounded shadow-sm">
+<h6 class="pb-2 mb-0 text-center text-info-emphasis">Comentários</h6>
+@if (mostrar)
+{
+    <div class="d-flex justify-content-center ">
+        @Html.ActionLink("Novo Comentário", "Create", "Comment", new { postId = @Model.Id }, new { @class = "btn btn-sm btn-outline-warning "})
+    </div>
+}
 
-    <h6 class="border-bottom pb-2 mb-0">Comentários | @Html.ActionLink("Comentar", "Create", "Comment", new { postId = @Model.Id }, new { @class = "btn btn-primary btn-large"})</h6>
-
+<div class="list-group w-auto apexcharts-tooltip-text-goals-label pt-3">
     @foreach (var comment in Model.Comments.OrderByDescending(m => m.Id))
     {
-        <div class="d-flex text-muted pt-3">
-            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff" /><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
+        <a asp-controller="Comment"
+       asp-action="Create"
+       asp-route-postId="@Model.Id"
+       asp-route-commentId="@comment.Id"
+       class="list-group-item list-group-item-action d-flex gap-3 py-3"
+       aria-current="true">
 
-            <p class="pb-3 mb-0 small lh-sm border-bottom">
-                <strong class="d-block text-gray-dark">
-                    @@Usuario - @comment.Date - @Html.ActionLink("X", "Delete", "Comment", new { PostId = @Model.Id, CommentId = @comment.Id })
-                </strong>
-                @comment.Content
-            </p>
-        </div>
+            @*<img src="https://github.com/twbs.png" alt="twbs" width="32" height="32" class="rounded-circle flex-shrink-0">*@
+
+            <div class="d-flex gap-2 w-100 justify-content-between">
+                <div>
+                    <h6 class="mb-0">
+                        @*@UserManager.GetUserName(User).Split("@")[0]*@
+                        @comment.CommentUser.Split("@")[0]
+                        @if (IdUser == @comment.UserId)
+                        {
+                            <form style="display: contents;">
+                                <button class="ms-2 btn btn-outline-danger" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .60rem;" asp-controller="Comment" asp-action="Delete" asp-route-PostId=@Model.Id asp-route-CommentId=@comment.Id>Remover</button>
+                            </form>
+                        }
+                    </h6>
+                    <p class="mb-0 opacity-75">@comment.Content</p>
+                </div>
+
+                <small class="opacity-50 text-nowrap">@comment.Date.ToString("dd/MM/yyyy")</small>
+
+            </div>
+
+            @foreach (var sub in comment.SubComments.OrderByDescending(m => m.Id))
+            {
+                <a class="list-group-item list-group-item-action d-flex gap-3 py-6 ps-5 " aria-current="true">
+                    <div class="d-flex gap-2 w-100 justify-content-between">
+                        <div>
+                            <h6 class="mb-0" style="font-size:0.8rem!important">
+                                @sub.CommentUser.Split("@")[0]
+                                @if (IdUser == @sub.UserId)
+                                {
+                                    <form style="display: contents;">
+                                        <button class="ms-2 btn btn-outline-danger" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .60rem;" 
+                                        asp-controller="Comment" 
+                                        asp-action="Delete" 
+                                        asp-route-PostId=@Model.Id 
+                                        asp-route-CommentId=@sub.Id>Remover</button>
+                                    </form>
+                                }
+                            </h6>
+                            <p class="mb-0 mt-1 opacity-75" style="font-size:0.8rem!important">
+                                @sub.Content
+                            </p>
+                        </div>
+                        <small class="opacity-50 text-nowrap">
+                            @sub.Date.ToString("dd/MM/yyyy")
+                        </small>
+                    </div>
+                </a>
+            }
+        </a>
     }
 </div>

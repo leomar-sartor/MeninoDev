@@ -7,6 +7,8 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using X.PagedList;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MeninoDev.Controllers
 {
@@ -19,30 +21,38 @@ namespace MeninoDev.Controllers
         {
             _connectionString = configuration.GetConnectionString("database");
         }
+
+        [AllowAnonymous]
         public IActionResult Index(string searchString, int? pageNumber = 1)
         {
-            ViewData["CurrentFilter"] = searchString;
+            if (pageNumber == 0)
+                pageNumber = 1;
 
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                //students = students.Where(s => s.LastName.Contains(searchString)
-                //                       || s.FirstMidName.Contains(searchString));
-            }
+            @ViewBag.SearchString = searchString;
+
+            ViewData["CurrentFilter"] = searchString;
 
             IEnumerable<Post> posts;
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 var sql = "SELECT * FROM POST";
+
+                if (!String.IsNullOrEmpty(searchString))
+                {
+                    sql = sql + @$" WHERE Title like '%{searchString}%'";
+                }
+
                 posts = db.Query<Post>(sql);
             }
 
-
             int pageSize = 6;
-            var postes = PaginatedList<Post>.Create(posts.OrderByDescending(m => m.Date), pageNumber ?? 1, pageSize);
-            
+            //var postes = PaginatedList<Post>.Create(posts.OrderByDescending(m => m.Date), pageNumber ?? 1, pageSize);
 
-            return View(postes);
+            var retorno = posts.OrderByDescending(m => m.Date).ToPagedList((int)pageNumber, 6);
+
+            
+            return View(retorno);
         }
 
         public IActionResult Form(long Id)
@@ -70,9 +80,8 @@ namespace MeninoDev.Controllers
                 return View();
             }
 
-
-            if (post.Imagem != null)
-            {
+            //if (post.Imagem != null)
+            //{
                 //string pastaFotos = Path.Combine(webHostEnvironment.WebRootPath, "Imagens");
                 //nomeUnicoArquivo = Guid.NewGuid().ToString() + "_" + model.Foto.FileName;
                 //string caminhoArquivo = Path.Combine(pastaFotos, nomeUnicoArquivo);
@@ -80,13 +89,13 @@ namespace MeninoDev.Controllers
                 //{
                 //    model.Foto.CopyTo(fileStream);
                 //}
-            }
+            //}
 
             if (post.Id > 0)
             {
                 using (IDbConnection db = new SqlConnection(_connectionString))
                 {
-                    var sql = @"UPDATE POST SET Date = @Date, Title = @Title, Content = @Content OUTPUT INSERTED.* WHERE Id = @Id";
+                    var sql = @"UPDATE POST SET Date = @Date, Title = @Title, Content = @Content, Url = @Url OUTPUT INSERTED.* WHERE Id = @Id";
                     post.Date = DateTime.Today;
 
                     var retorno = db.QuerySingle<Post>(sql, new
@@ -94,6 +103,7 @@ namespace MeninoDev.Controllers
                         post.Date,
                         post.Title,
                         post.Content,
+                        post.Url,
                         post.Id
                     });
                 }
@@ -105,14 +115,15 @@ namespace MeninoDev.Controllers
 
                 using (IDbConnection db = new SqlConnection(_connectionString))
                 {
-                    var sql = @"INSERT POST (Date, Title, Content) OUTPUT INSERTED.* VALUES (@Date, @Title, @Content)";
+                    var sql = @"INSERT POST (Date, Title, Content, Url) OUTPUT INSERTED.* VALUES (@Date, @Title, @Content, @Url)";
                     post.Date = DateTime.Today;
 
                     var retorno = db.QuerySingle<Post>(sql, new
                     {
                         post.Date,
                         post.Title,
-                        post.Content
+                        post.Content,
+                        post.Url
                     });
                 }
 
@@ -137,20 +148,33 @@ namespace MeninoDev.Controllers
         }
 
 
-        public IActionResult Read(long Id)
+        public IActionResult Read(long Id, long Page = 0)
         {
-
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 var sqlPost = "SELECT * FROM POST WHERE Id = @PostId";
                 var Post = db.QueryFirstOrDefault<Post>(sqlPost, new { PostId = Id });
 
-                var sqlComments = "SELECT * FROM COMMENT WHERE PostId = @PostId";
-                Post.Comments = db.Query<Comment>(sqlComments, new { PostId = Id }).ToList();
+                var sqlComments = @$"
+                                    SELECT C.*, U.UserName as CommentUser FROM COMMENT C 
+                                    INNER JOIN AspNetUsers U ON U.Id = C.UserId
+                                    WHERE PostId = @PostId and CommentId = 0";
+                var comments = db.Query<Comment>(sqlComments, new { PostId = Id }).ToList();
+                Post.PostPage = Page;
+
+                foreach (var cm in comments)
+                {
+                    var sqlSubComments = @$"SELECT C.*, U.UserName as CommentUser FROM COMMENT C 
+                                    INNER JOIN AspNetUsers U ON U.Id = C.UserId
+                                    WHERE CommentId = @CommentId";
+                    var subcomments = db.Query<Comment>(sqlSubComments, new { CommentId = cm.Id }).ToList();
+                    cm.SubComments = subcomments;
+                }
+
+                Post.Comments = comments;
 
                 return View(Post);
             }
         }
-
     }
 }

@@ -21,13 +21,20 @@ namespace MeninoDev.Entidades
         [Display(Name = "Título")]
         public string Title { get; set; }
 
-        [Required(ErrorMessage = "É necessário uma imagem")]
-        [Display(Name = "Imagem")]
-        public IFormFile Imagem { get; set; }
+        //[Required(ErrorMessage = "É necessário uma imagem")]
+        //[Display(Name = "Imagem")]
+        //public IFormFile Imagem { get; set; }
 
         [AllowHtml]
         [Display(Name = "Conteúdo")]
         public string Content { get; set; }
+
+        [Display(Name = "Imagem")]
+        public string Url { get; set; }
+
+        //public string searchString { get; set; }
+        
+        public long PostPage { get; set; }
 
         public List<Comment> Comments { get; set; }
     }

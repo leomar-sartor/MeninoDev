@@ -1,67 +1,111 @@
 ﻿@page
 @model RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Registra-se";
+    Layout = "~/Views/Shared/_NiceAdminTemplate.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container">
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h4>Create a new account.</h4>
-            <hr />
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Input.Email"></label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.Password"></label>
-                <input asp-for="Input.Password" class="form-control" />
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.ConfirmPassword"></label>
-                <input asp-for="Input.ConfirmPassword" class="form-control" />
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h4>Use another service to register.</h4>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
-                            for details on setting up this ASP.NET application to support logging in via external services.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+    <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-1">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+
+                    <div class="d-flex justify-content-center py-4">
+                        <a asp-controller="Post" asp-action="Index" class="logo d-flex align-items-center w-auto">
+                            <img src="assets/img/logo.png" alt="">
+                            <span class="d-none d-lg-block">YouCode</span>
+                            </a>
+                    </div><!-- End Logo -->
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="card mb-3">
+
+                        <div class="card-body">
+
+                            <div class="pt-2 pb-2">
+                                <h5 class="card-title text-center pb-0 fs-4">Crie sua conta aqui</h5>
+                                <p class="text-center small">Digite seus dados para criar uma conta</p>
+                            </div>
+
+                            <form class="row g-3 needs-validation" asp-route-returnUrl="@Model.ReturnUrl" method="post" novalidate>
+
+                                @*<div class="col-12">
+                                    <label for="yourEmail" class="form-label">E-mail</label>
+                                    <input type="email" name="email" class="form-control" id="yourEmail" required>
+                                    <div class="invalid-feedback">Please enter a valid Email adddress!</div>
+                                </div>*@
+
+                                <div class="form-group">
+                                    <label asp-for="Input.Email"></label>
+                                    <input asp-for="Input.Email" class="form-control" />
+                                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                                </div>
+
+                                @*<div class="col-12">
+                                    <label for="yourPassword" class="form-label">Senha</label>
+                                    <input type="password" name="password" class="form-control" id="yourPassword" required>
+                                    <div class="invalid-feedback">Please enter your password!</div>
+                                </div>*@
+
+                                <div class="form-group">
+                                    <label asp-for="Input.Password"></label>
+                                    <input asp-for="Input.Password" class="form-control" />
+                                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                </div>
+
+                                @*<div class="col-12">
+                                    <label for="yourPassword2" class="form-label">Senha2</label>
+                                    <input type="password" name="password" class="form-control" id="yourPassword" required>
+                                    <div class="invalid-feedback">Please enter your password!</div>
+                                </div>*@
+
+                                <div class="form-group">
+                                    <label asp-for="Input.ConfirmPassword"></label>
+                                    <input asp-for="Input.ConfirmPassword" class="form-control" />
+                                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required>
+                                        <label class="form-check-label" for="acceptTerms">Eu concordo e aceito os<a href="#"> termos e condições</a></label>
+                                        <div class="invalid-feedback">You must agree before submitting.</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <button class="btn btn-primary w-100" type="submit">Criar Conta</button>
+                                </div>
+                                <div class="col-12">
+                                    <p class="small mb-0">Já tem uma conta? 
+                                     <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Entrar</a>
+                                        
+                                            </p>
+                                </div>
+                            </form>
+
                         </div>
-                    </form>
-                }
-            }
-        </section>
-    </div>
+                    </div>
+
+                    <div class="credits">
+                        <!-- All the links in the footer should remain intact. -->
+                        <!-- You can delete the links only if you purchased the pro version. -->
+                        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
+                        Criado por <a href="https://bootstrapmade.com/">LS System</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+<partial name="_ValidationScriptsPartial" />
 }

@@ -4,27 +4,42 @@
     ViewData["Title"] = "Novo";
 }
 
-<h4>Post</h4>
-<hr />
+<div class="row">
+    <div class="col-10 text-start">
+        <h4 class="blog-post-title text-success-emphasis">
+            Adicionar Comentário
+        </h4>
+    </div>
+    <div class="col-2 text-end p-2" style="">
+        @Html.ActionLink("Voltar", "Read", "Post", new { Id = @Model.PostId }, new { @class = "btn btn-sm btn-outline-primary" })
+    </div>
+</div>
+
+<hr class="m-0 mb-2" />
 
 <div class="row">
     <div class="col-md-12">
         @using (Html.BeginForm("Create", "Comment", FormMethod.Post))
         {
             @Html.HiddenFor(model => model.PostId)
+            @Html.HiddenFor(model => model.UserId)
+            @Html.HiddenFor(model => model.CommentId)
 
-            <div class="form-group">
-                @Html.DisplayNameFor(model => model.Content)
+           @* <div class="form-group">
                 @Html.TextAreaFor(model => model.Content, new { @cols = 150, @rows = 3 })
                 @Html.ValidationMessageFor(model => model.Content)
+            </div>*@
+            
+
+            <div class="form-floating pt-2">
+                @Html.TextAreaFor(model => model.Content, new { @cols = 200, @rows = 7, @class="form-control", @placeholder="teste", style = "height: 150px;" })
+                <label for="Content">Seu comentário</label>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Adicionar" class="btn btn-primary" />
+
+            <div class="form-group text-center mt-2">
+                <input type="submit" value="Adicionar" class="btn btn-sm btn-outline-warning" />
             </div>
         }
     </div>
 </div>
 
-<div>
-    @Html.ActionLink("Voltar", "Read", "Post", new { Id = @Model.PostId }, new { @class = "btn btn-primary btn-large" })
-</div>

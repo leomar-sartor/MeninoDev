@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
 using Dapper;
+using System.Linq;
 
 namespace MeninoDev.Controllers
 {
@@ -18,10 +19,12 @@ namespace MeninoDev.Controllers
             _connectionString = configuration.GetConnectionString("database");
         }
 
-        public IActionResult Create(long postId)
+        public IActionResult Create(long postId, long commentId = 0)
         {
             var comment = new Comment();
             comment.PostId = postId;
+            comment.UserId = User.Claims.FirstOrDefault().Value;
+            comment.CommentId = commentId;
 
             return View(comment);
         }
@@ -31,20 +34,23 @@ namespace MeninoDev.Controllers
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                var sql = @"INSERT COMMENT (PostId, Date, Content) OUTPUT INSERTED.* VALUES (@PostId, @Date, @Content)";
+                var sql = @"INSERT COMMENT (PostId, Date, Content, UserId, CommentId) OUTPUT INSERTED.* VALUES (@PostId, @Date, @Content, @UserId, @CommentId)";
                 comment.Date = DateTime.Today;
 
                 var retorno = db.QuerySingle<Comment>(sql, new
                 {
                     comment.PostId,
                     comment.Date,
-                    comment.Content
+                    comment.Content,
+                    comment.UserId,
+                    comment.CommentId
                 });
             }
 
             return RedirectToAction("Read", "Post", new { Id = comment.PostId });
         }
 
+        [Route("/Comment/Delete/{PostId}/{CommentId}")]
         public IActionResult Delete(long PostId, long CommentId)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))

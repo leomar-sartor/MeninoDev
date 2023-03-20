@@ -1,156 +1,158 @@
 ﻿@using MeninoDev.Contexto
 @using Microsoft.AspNetCore.Identity
-@model MeninoDev.Entidades.PaginatedList<MeninoDev.Entidades.Post>
+
+@using X.PagedList.Mvc;
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Mvc.Core.Common
+@model X.PagedList.PagedList<MeninoDev.Entidades.Post>
+
+
+
 @inject SignInManager<UserApp> SignInManager
 
 @{
-    ViewData["Title"] = "Posts";
+    ViewData["Title"] = "Home";
+
+    var mostrar = (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"));
+    var cont = 0;
 }
-
-@{
-
-    if (TempData["Sucesso"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["Sucesso"]
-        </div>
-    }
-
-    if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">
-            @TempData["Error"]
-        </div>
-    }
-
-    if (TempData["Exclusao"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["Exclusao"]
-        </div>
-    }
-}
-
-@*@if (SignInManager.IsSignedIn(User))
-    {
-    <p>LOGADO</p>
-    }
-*@
-
-@*<form asp-action="Index" method="get">
-    <div class="form-actions no-color">
-        <p>
-            @Html.ActionLink("Novo", "Form", "Post", null, new { @class = "btn btn-primary btn-large" })
-            Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
-            <input type="submit" value="Search" class="btn btn-default" /> |
-            <a asp-action="Index">Back to Full List</a>
-        </p>
-    </div>
-</form>*@
-
-@*@foreach (var item in Model.OrderByDescending(m => m.Id))
-    {
-    <div class="row mb-2">
-    <div class="col-md-12">
-    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-    <div id="@Html.DisplayFor(modelItem => item.Id)" class="col p-4 d-flex flex-column position-static">
-    <strong class="d-inline-block mb-2 text-primary">Categoria</strong>
-    <h3 class="mb-0">
-    @Html.DisplayFor(modelItem => item.Title)
-    </h3>
-    <div class="mb-1 text-muted">
-    @Html.DisplayFor(modelItem => item.Date)
-    </div>
-    <p class="card-text mb-auto">
-    @Html.DisplayFor(modelItem => item.Content)
-    </p>
-
-    @Html.ActionLink("Continue reading", "Read", "Post", new { Id = @item.Id }, new { @class = "stretched-link" })
-    </div>
-    </div>
-    </div>
-    </div>
-    }*@
-
-
 
 <div class="row">
+    <div class="col-4">
+    </div>
+    <div class="col-4 text-center">
+        @if (mostrar)
+        {
+            @Html.ActionLink("Novo", "Form", "Post", null, "", null, null, new { @class = "btn btn-sm btn-outline-success mb-2"})
+        }
+    </div>
+    <div class="col-4">
+    </div>
+</div>
+
+@*@using (Html.BeginForm())
+{
+    <p>
+        Find by name: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" />
+    </p>
+}*@
+
+<form class="form-inline my-2 my-lg-0">
+    <div class="input-group">
+        <input name="searchString" value="@ViewBag.SearchString" type="text" class="form-control" placeholder="Encontrar" aria-label="Recipient's username" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="btn btn-outline-success" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+    </div>
+</form>
+
+<div class="row pt-3">
     @foreach (var item in Model.OrderByDescending(m => m.Id))
     {
+        cont = cont + 1;
+        var url = item.Url ?? "https://kinsta.com/pt/wp-content/uploads/sites/3/2020/04/ferramentas-de-revisao-de-codigo-1024x512.png";
+
+        @*h-100*@
         <div class="col-md-4">
             <div class="card mb-4 shadow-sm">
-                <img width="100%" height="225" background="#55595c" color="#eceeef" class="card-img-top" text="Thumbnail" src="https://onclick.com.br/wp-content/uploads/2019/09/303865-x-vantagens-de-ter-um-software-sob-medida-no-seu-negocio-600x443.jpg" />
+
+                <img width="100%" height="225" background="#55595c" color="#eceeef" class="card-img-top" text="Thumbnail" src=@url />
+
                 <div class="card-body">
-                    <p class="card-text">
-                        @Html.DisplayFor(modelItem => item.Title)
+                    <p class="card-text fw-bold" style="text-align: justify !important;">
+                        @{
+                            if (item.Title.Length > 70)
+                            {
+                                var tam = item.Title.Length;
+                                var res = item.Title.Remove(70, item.Title.Length - 70);
+                                res = res + "...";
+                                @res
+                            }
+                            else
+                            {
+                                @item.Title
+                            }
+                        }
                     </p>
                     <div class="d-flex justify-content-between align-items-center">
-                        @*<div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                            Só se for administrador
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                            </div>*@
-                        <small class="text-muted right"> @Html.DisplayFor(modelItem => item.Date)</small>
+                        <div>
+                            <small class="text-muted right">
+                                @item.Date.ToString("dd/MM/yyyy")
+                            </small>
+                        </div>
+
+
+                        <div style="z-index: 9999;">
+                            @if (mostrar)
+                            {
+                                <a asp-controller="Post"
+                           asp-action="Form"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-warning"
+                           role="button">
+                                    Editar
+                                </a>
+                                <a asp-controller="Post"
+                           asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-danger"
+                           role="button">
+                                    Excluir
+                                </a>
+                            }
+                        </div>
                     </div>
                 </div>
-                @Html.ActionLink("", "Read", "Post", new { Id = @item.Id }, new { @class = "stretched-link" })
+
+                @Html.ActionLink("", "Read", "Post", new { Id = @item.Id, Page = Model.PageNumber }, new { @class = "stretched-link" })
+                @*<a class="btn btn-sm btn-outline-primary" asp-action="Read" asp-controller="Post" asp-route-returnUrl="@Model.ReturnUrl"></a>*@
             </div>
         </div>
+
+
     }
 </div>
 
-@{
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-}
-@*https://docs.microsoft.com/pt-br/aspnet/core/data/ef-mvc/sort-filter-page?view=aspnetcore-6.0*@
+<div class="text-center mb-2">
+<p>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</p>
+</div>
+
+
 
 <nav aria-label="Page navigation example">
-<ul class="pagination justify-content-center">
-<li>
-    <a asp-action="Index"
-       asp-route-pageNumber="@(Model.PageIndex - 1)"
-       class="btn btn-default @prevDisabled">
-        Previous
-    </a>
+    @Html.PagedListPager(
+    Model,
+    page => Url.Action("Index", new { pageNumber = page, searchString = @ViewBag.SearchString?? "" }),
+    new PagedListRenderOptions
+    {
+    LiElementClasses = new string[] { "page-item" },
+    UlElementClasses = new string[] {"pagination justify-content-center"},
+    PageClasses = new string [] { "page-link" },
+    }
+    )
+</nav>
+@*    <h3>Custom Wording (<em>Spanish Translation Example</em>)</h3>
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions { LinkToFirstPageFormat = "<< Primera", LinkToPreviousPageFormat = "< Anterior", LinkToNextPageFormat = "Siguiente >", LinkToLastPageFormat = "&Uacute;ltima >>" })
+
+    <h3>Show Range of Items For Each Page</h3>
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions { FunctionToDisplayEachPageNumber = page => ((page - 1) * ViewBag.Names.PageSize + 1).ToString() + "-" + (((page - 1) * ViewBag.Names.PageSize) + ViewBag.Names.PageSize).ToString(), MaximumPageNumbersToDisplay = 5 })
+
+    <h3>With Delimiter</h3>
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), new PagedListRenderOptions { DelimiterBetweenPageNumbers = "|" })
+*@
+@*https://learn.microsoft.com/pt-br/aspnet/mvc/overview/getting-started/getting-started-with-ef-using-mvc/sorting-filtering-and-paging-with-the-entity-framework-in-an-asp-net-mvc-application*@
+
+@*<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+    <li class="page-item disabled">
+    <a class="page-link">Previous</a>
     </li>
-<a asp-action="Index"
-    asp-route-pageNumber="@(Model.PageIndex - 1)"
-    class="btn btn-default @prevDisabled">
-    @(Model.PageIndex - 2)
-    </a>
-
-    <a asp-action="Index"
-    asp-route-pageNumber="@(Model.PageIndex - 1)"
-    class="btn btn-default">
-    @(Model.PageIndex - 1)
-    </a>
-
-    <a asp-action="Index"
-    asp-route-pageNumber="@(Model.PageIndex - 1)"
-    class="btn btn-default @prevDisabled">
-    @Model.PageIndex
-    </a>
-
-
-    <a asp-action="Index"
-    asp-route-pageNumber="@(Model.PageIndex - 1)"
-    class="btn btn-default @prevDisabled">
-    @(Model.PageIndex + 1)
-    </a>
-
-    <a asp-action="Index"
-    asp-route-pageNumber="@(Model.PageIndex - 1)"
-    class="btn btn-default @prevDisabled">
-    @(Model.PageIndex + 2)
-    </a>
-
-
-    <li>
-<a asp-action="Index"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>
-</li>
-</ul></nav>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item">
+    <a class="page-link" href="#">Next</a>
+    </li>
+    </ul>
+    </nav>*@

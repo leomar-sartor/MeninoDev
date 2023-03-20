@@ -44,36 +44,36 @@ namespace MeninoDev
             services.AddControllersWithViews();
             services.AddRazorPages();
 
-            //services.AddAuthentication()
-            //    .AddGoogle(options =>
-            //    {
-            //        IConfigurationSection googleAuthNSection =
-            //            Configuration.GetSection("Authentication:Google");
-            //        options.ClientId = googleAuthNSection["ClientId"];
-            //        options.ClientSecret = googleAuthNSection["ClientSecret"];
-            //    })
-            //    .AddFacebook(opt =>
-            //    {
-            //        IConfigurationSection googleAuthNSection =
-            //            Configuration.GetSection("Authentication:Facebook");
-            //        opt.ClientId = googleAuthNSection["AppId"];
-            //        opt.ClientSecret = googleAuthNSection["AppSecret"];
-            //    })
-            //    .AddMicrosoftAccount(microsoftOptions =>
-            //    {
-            //        IConfigurationSection googleAuthMsft =
-            //            Configuration.GetSection("Authentication:Microsoft");
-            //        microsoftOptions.ClientId = googleAuthMsft["AppId"];
-            //        microsoftOptions.ClientSecret = googleAuthMsft["AppSecret"];
-            //    })
-            //   .AddTwitter(twitterOptions =>
-            //   {
-            //       IConfigurationSection googleAuthTwt =
-            //            Configuration.GetSection("Authentication:Twiter");
-            //       twitterOptions.ConsumerKey = googleAuthTwt["AppId"];
-            //       twitterOptions.ConsumerSecret = googleAuthTwt["AppSecret"];
-            //       twitterOptions.RetrieveUserDetails = true;
-            //   });
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    IConfigurationSection googleAuthNSection =
+                        Configuration.GetSection("Authentication:Google");
+                    options.ClientId = googleAuthNSection["ClientId"];
+                    options.ClientSecret = googleAuthNSection["ClientSecret"];
+                });
+               // .AddFacebook(opt =>
+               // {
+               //     IConfigurationSection googleAuthNSection =
+               //         Configuration.GetSection("Authentication:Facebook");
+               //     opt.ClientId = googleAuthNSection["AppId"];
+               //     opt.ClientSecret = googleAuthNSection["AppSecret"];
+               // })
+               // .AddMicrosoftAccount(microsoftOptions =>
+               // {
+               //     IConfigurationSection googleAuthMsft =
+               //         Configuration.GetSection("Authentication:Microsoft");
+               //     microsoftOptions.ClientId = googleAuthMsft["AppId"];
+               //     microsoftOptions.ClientSecret = googleAuthMsft["AppSecret"];
+               // })
+               //.AddTwitter(twitterOptions =>
+               //{
+               //    IConfigurationSection googleAuthTwt =
+               //         Configuration.GetSection("Authentication:Twiter");
+               //    twitterOptions.ConsumerKey = googleAuthTwt["AppId"];
+               //    twitterOptions.ConsumerSecret = googleAuthTwt["AppSecret"];
+               //    twitterOptions.RetrieveUserDetails = true;
+               //});
 
             //.AddFacebook(facebookOptions =>
             //{
