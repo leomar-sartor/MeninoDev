@@ -37,28 +37,37 @@ namespace MeninoDev.Controllers
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                var sql = "SELECT * FROM POST";
+                var sql = "SELECT * FROM CATEGORY";
 
                 if (!String.IsNullOrEmpty(searchString))
                 {
-                    sql = sql + @$" WHERE Title like '%{searchString}%'";
+                    sql = sql + @$" WHERE Name like '%{searchString}%'";
                 }
 
                 categorias = db.Query<Categoria>(sql);
             }
 
             int pageSize = 20;
-            //var postes = PaginatedList<Post>.Create(posts.OrderByDescending(m => m.Date), pageNumber ?? 1, pageSize);
 
-            var retorno = categorias.OrderByDescending(m => m.Id).ToPagedList((int)pageNumber, 6);
-
+            var retorno = categorias.OrderByDescending(m => m.Id).ToPagedList((int)pageNumber, pageSize);
 
             return View(retorno);
         }
 
         public async Task<IActionResult> Form(long Id)
         {
-            return View();
+            var categoria = new Categoria(); // await _rTipoProduto.Buscar(Id);
+
+            if (Id > 0)
+            {
+                using (IDbConnection db = new SqlConnection(_connectionString))
+                {
+                    var sql = "SELECT * FROM Category WHERE Id = @Id";
+                    categoria = await db.QueryFirstOrDefaultAsync<Categoria>(sql, new { Id = Id });
+                }
+            }
+
+            return View(categoria);
         }
 
         [HttpPost]
@@ -67,8 +76,59 @@ namespace MeninoDev.Controllers
             if (!ModelState.IsValid)
                 return View(form);
 
+            if (form.Id > 0)
+            {
+                using (IDbConnection db = new SqlConnection(_connectionString))
+                {
+                    var sql = @"UPDATE CATEGORY SET Date = @Date, Name = @Name OUTPUT INSERTED.* WHERE Id = @Id";
+                    form.Date = DateTime.Today;
+
+                    var retorno = db.QuerySingle<Categoria>(sql, new
+                    {
+                        form.Date,
+                        form.Name,
+                        form.Id
+                    });
+                }
+
+                TempData["Sucesso"] = "Post atualizado!";
+            }
+            else
+            {
+
+                using (IDbConnection db = new SqlConnection(_connectionString))
+                {
+                    var sql = @"INSERT CATEGORY (Name, Date) OUTPUT INSERTED.* VALUES (@Name, @Date)";
+                    form.Date = DateTime.Today;
+
+                    var retorno = db.QuerySingle<Categoria>(sql, new
+                    {
+                        form.Date,
+                        form.Name
+                    });
+                }
+
+                TempData["Sucesso"] = "Post salvo com sucesso!";
+            }
+
 
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Delete(long Id)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                var sql = "DELETE FROM CATEGORY WHERE Id = @Id";
+
+                db.Query(sql, new { Id = Id });
+            }
+
+            TempData["Exclusao"] = "Categoria removida com sucesso!";
+
+            return RedirectToAction("Index");
+        }
+
+        
     }
 }

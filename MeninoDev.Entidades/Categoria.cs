@@ -14,5 +14,9 @@ namespace MeninoDev.Entidades
         }
 
         public long Id { get; set; }
+
+        public DateTime Date { get; set; }
+
+        public string Name { get; set; }
     }
 }

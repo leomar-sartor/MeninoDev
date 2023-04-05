@@ -1,1 +1,55 @@
-﻿
+﻿@model MeninoDev.Entidades.Categoria
+
+@{
+    ViewData["Title"] = "Categoria";
+}
+
+<div class="row">
+    <div class="col">
+
+        @using (Html.BeginForm("Form", "Categoria", FormMethod.Post))
+        {
+            @Html.HiddenFor(m => m.Id)
+
+            <div class="row">
+                <div class="col">
+                    <a class="btn btn-sm btn-outline-primary" href="javascript:history.go(-1)">Voltar</a>
+                </div>
+                <div class="col text-center align-middle pt-2">
+                    @if (Model.Id == 0)
+                    {
+                        <h6>Nova Categoria</h6>
+                    }
+                    else
+                    {
+                        <h6> Categoria Nº @Model.Id</h6>
+                    }
+                </div>
+                <div class="col text-end">
+                    <input type="submit" value="Salvar" class="btn btn-sm btn-outline-success" />
+                </div>
+            </div>
+
+            <div class="text-warnig">
+                <hr>
+            </div>
+
+            <div class="col">
+                <label class="form-label"> @Html.DisplayNameFor(model => model.Name) </label>
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", @placeholder = "Nome" } })
+                <small class="text-muted">
+                    @Html.ValidationMessageFor(model => model.Name, null, new { @class = "text-danger" })
+                </small>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+
+    $(document).ready(function () {
+    });
+
+</script>
+}

@@ -1,8 +1,19 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using MeninoDev.Contexto
+@using System.Security.Claims;
 
 @inject SignInManager<UserApp> SignInManager
 @inject UserManager<UserApp> UserManager
+
+@{
+    var mostrar = (SignInManager.IsSignedIn(User));
+
+    var IdUser = User.FindFirst(ClaimTypes.NameIdentifier);
+
+    UserApp user = new UserApp();
+    if (IdUser != null)
+        user = await UserManager.FindByIdAsync(IdUser.Value);
+}
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -16,7 +27,7 @@
     @*<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">*@
     <link href="~/lib/fontawesome-free-6.1.2-web/css/all.css" rel="stylesheet">
 
-    <link href="~/assets/img/favicon.png" rel="icon">
+    <link href="~/assets/logo/favicon_transparent_32x32.png" rel="icon">
     <link href="~/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
@@ -37,11 +48,108 @@
 </head>
 <body>
 
-    <div class="container">
+    @if (mostrar)
+    {
+        <!-- ======= Header ======= -->
+        <header id="header" class="header fixed-top d-flex align-items-center">
+
+            <div class="d-flex align-items-center justify-content-between">
+                <a asp-controller="Post" asp-action="Index" class="logo d-flex align-items-center">
+                    <img src="~/assets/logo/lamp.png" alt="">
+                    <span class="d-none d-lg-block ms-2 text-danger-emphasis">YouCode</span>
+                </a>
+                
+
+
+                <i class="bi bi-list toggle-sidebar-btn"></i>
+            </div><!-- End Logo -->
+
+            
+
+        <nav class="header-nav ms-auto">
+                <ul class="d-flex align-items-center">
+
+                    <li class="nav-item dropdown pe-3">
+
+                        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                            
+                            @if (String.IsNullOrEmpty(user.UrlFoto))
+                            {
+                                <img src="~/Documentos/profiledefault.jpg" alt="Profile"  class="rounded-circle">
+                            }
+                            else
+                            {
+                            <img src="~/Documentos/@user.UrlFoto" alt="Profile" class="rounded-circle">
+                            }
+
+                            <span class="d-none d-md-block dropdown-toggle ps-3">
+                                @if (String.IsNullOrEmpty(user.Apelido))
+                                {
+                                    @UserManager.GetUserName(User).Split("@")[0]
+                                }
+                                else
+                                {
+                                    @user.Apelido
+                                }
+                            </span>
+                        </a><!-- End Profile Iamge Icon -->
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" asp-controller="Perfil" asp-action="Form">
+                                    <i class="bi bi-person"></i>
+                                    <span>Perfil</span>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" asp-area="Identity" asp-page="/Account/Logout">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Sair</span>
+                                </a>
+                            </li>
+                        </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+            </nav><!-- End Icons Navigation -->
+
+    </header>
+
+        <!-- End Header -->
+        <!-- ======= Sidebar ======= -->
+        <aside id="sidebar" class="sidebar">
+
+            <ul class="sidebar-nav" id="sidebar-nav">
+
+                <li class="nav-heading">Páginas</li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Perfil" asp-action="Form">
+                        <i class="bi bi-person"></i>
+                        <span>Perfil</span>
+                    </a>
+                </li><!-- End Profile Page Nav -->
+        </ul>
+
+        </aside>
+
+        <!-- End Sidebar-->
+
+        <main role="main" id="main" class="main">
+            @RenderBody()
+        </main>
+    }
+    else
+    {
+
         <main role="main">
             @RenderBody()
         </main>
-    </div>
+    }
+
 
     <!-- Vendor JS Files -->
     <script src="~/assets/vendor/apexcharts/apexcharts.min.js"></script>

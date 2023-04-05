@@ -1,8 +1,18 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using MeninoDev.Contexto
+@using System.Security.Claims;
 
 @inject SignInManager<UserApp> SignInManager
 @inject UserManager<UserApp> UserManager
+
+    @{
+    var IdUser = User.FindFirst(ClaimTypes.NameIdentifier);
+
+    UserApp user = new UserApp();
+    if (IdUser != null)
+        user = await UserManager.FindByIdAsync(IdUser.Value);
+}
+
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -16,6 +26,7 @@
     @*<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">*@
     <link rel="stylesheet" href="~/lib/summernote-0.8.18-dist/summernote.css" />
     <link href="~/lib/fontawesome-free-6.1.2-web/css/all.css" rel="stylesheet">
+    <link href="~/assets/logo/favicon_transparent_32x32.png" rel="icon">
 </head>
 <body>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -36,16 +47,16 @@
     <header class="p-3 mb-3 border-bottom">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-
-                    <img src="https://getbootstrap.com/docs/4.3/assets/brand/bootstrap-solid.svg" width="30" height="30" alt="">
+                <a asp-controller="Post" asp-action="Index" class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                    <img src="~/assets/logo/lamp.png" width="20" height="30" alt="" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
                 </a>
 
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center ms-2 mb-md-0">
                     <li>
-                        <a asp-controller="Post" asp-action="Index" class="nav-link px-2 link-secondary">
-                           YouCode
-                            </a></li>
+                        <a asp-controller="Post" asp-action="Index" class="nav-link px-2 link-secondary text-danger-emphasis">
+                            YouCode
+                        </a>
+                    </li>
                     <li><a href="#" class="nav-link px-2 link-dark">React Native</a></li>
                     <li><a href="#" class="nav-link px-2 link-dark">NestJs</a></li>
                     <li class="nav-item dropdown">
@@ -63,25 +74,33 @@
 
                 @*<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" asp-action="Index" asp-controller="Post">
                     <input name="searchString" type="search" class="form-control" placeholder="Buscar..." aria-label="Buscar">
-                </form>*@
+                    </form>*@
 
-@*                @using (Html.BeginForm())
-{
-    <p>
-        Find by name: @Html.TextBox("SearchString")  
-        <input type="submit" value="Search" /></p>
-}
-*@
-               @* <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                @*                @using (Html.BeginForm())
+                    {
+                    <p>
+                    Find by name: @Html.TextBox("SearchString")
+                    <input type="submit" value="Search" /></p>
+                    }
+                *@
+                @* <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                     <button id="logout" type="submit" class="nav-link btn btn-link text-dark"><span style="color: Dodgerblue;"><i class="fa-solid fa-right-from-bracket"></i></span></button>
-                </form>*@
+                    </form>*@
 
                 <div class="dropdown text-end">
                     @if (SignInManager.IsSignedIn(User))
                     {
                         <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="	https://avatars.githubusercontent.com/u/6878177?v=4" alt="mdo" width="32" height="32" class="rounded-circle">
+                            @if (String.IsNullOrEmpty(user.UrlFoto))
+                            {
+                                <img src="~/Documentos/profiledefault.jpg" alt="Profile" alt="mdo" width="32" height="32" class="rounded-circle">
+                            }
+                            else
+                            {
+                                <img src="~/Documentos/@user.UrlFoto" alt="Profile" alt="mdo" width="32" height="32" class="rounded-circle">
+                            }
                         </a>
+
                         <ul class="dropdown-menu text-small dropdown-menu-end dropdown-menu-xxl-center ">
 
                             @if (User.IsInRole("Admin"))

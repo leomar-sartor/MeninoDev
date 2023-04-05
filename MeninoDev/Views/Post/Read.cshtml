@@ -12,6 +12,11 @@
 
     var mostrar = (SignInManager.IsSignedIn(User));
     var IdUser = User.Claims.FirstOrDefault().Value;
+
+    var UserId = User.FindFirst(ClaimTypes.NameIdentifier);
+    UserApp user = new UserApp();
+    if (IdUser != null)
+        user = await UserManager.FindByIdAsync(UserId.Value);
 }
 
 @section Styles {
@@ -92,11 +97,13 @@
                                 @if (IdUser == @sub.UserId)
                                 {
                                     <form style="display: contents;">
-                                        <button class="ms-2 btn btn-outline-danger" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .60rem;" 
-                                        asp-controller="Comment" 
-                                        asp-action="Delete" 
-                                        asp-route-PostId=@Model.Id 
-                                        asp-route-CommentId=@sub.Id>Remover</button>
+                                        <button class="ms-2 btn btn-outline-danger" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .60rem;"
+                                    asp-controller="Comment"
+                                    asp-action="Delete"
+                                    asp-route-PostId=@Model.Id
+                                    asp-route-CommentId=@sub.Id>
+                                            Remover
+                                        </button>
                                     </form>
                                 }
                             </h6>

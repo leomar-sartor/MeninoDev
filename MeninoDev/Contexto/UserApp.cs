@@ -5,5 +5,6 @@ namespace MeninoDev.Contexto
     public class UserApp : IdentityUser
     {
         public string Apelido { get; set; }
+        public string UrlFoto { get; set; }
     }
 }
