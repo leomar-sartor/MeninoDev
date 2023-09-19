@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Dapper;
 using MeninoDev.Entidades;
-using System.Data;
-using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 using System;
-using Dapper;
+using System.Data;
 using System.Linq;
 
 namespace MeninoDev.Controllers
 {
+    [Authorize]
     public class CommentController : Controller
     {
         public IConfiguration _configuration { get; }
@@ -32,12 +34,12 @@ namespace MeninoDev.Controllers
         [HttpPost]
         public IActionResult Create(Comment comment)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sql = @"INSERT COMMENT (PostId, Date, Content, UserId, CommentId) OUTPUT INSERTED.* VALUES (@PostId, @Date, @Content, @UserId, @CommentId)";
+                var sql = @"INSERT Comment (PostId, Date, Content, UserId, CommentId) VALUES (@PostId, @Date, @Content, @UserId, @CommentId)";
                 comment.Date = DateTime.Today;
 
-                var retorno = db.QuerySingle<Comment>(sql, new
+                var retorno = db.QuerySingleOrDefault<Comment>(sql, new
                 {
                     comment.PostId,
                     comment.Date,
@@ -53,9 +55,9 @@ namespace MeninoDev.Controllers
         [Route("/Comment/Delete/{PostId}/{CommentId}")]
         public IActionResult Delete(long PostId, long CommentId)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sql = "DELETE FROM COMMENT WHERE Id = @CommentId";
+                var sql = "DELETE FROM Comment WHERE Id = @CommentId";
 
                 db.Query(sql, new { CommentId });
             }

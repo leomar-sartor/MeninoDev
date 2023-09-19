@@ -1,19 +1,19 @@
 ﻿using Dapper;
 using MeninoDev.Entidades;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList;
 
 namespace MeninoDev.Controllers
 {
+    [Authorize]
     public class CategoriaController : Controller
     {
         public IConfiguration _configuration { get; }
@@ -35,9 +35,9 @@ namespace MeninoDev.Controllers
 
             IEnumerable<Categoria> categorias;
 
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sql = "SELECT * FROM CATEGORY";
+                var sql = "SELECT * FROM Category";
 
                 if (!String.IsNullOrEmpty(searchString))
                 {
@@ -56,11 +56,11 @@ namespace MeninoDev.Controllers
 
         public async Task<IActionResult> Form(long Id)
         {
-            var categoria = new Categoria(); // await _rTipoProduto.Buscar(Id);
+            var categoria = new Categoria(); 
 
             if (Id > 0)
             {
-                using (IDbConnection db = new SqlConnection(_connectionString))
+                using (IDbConnection db = new MySqlConnection(_connectionString))
                 {
                     var sql = "SELECT * FROM Category WHERE Id = @Id";
                     categoria = await db.QueryFirstOrDefaultAsync<Categoria>(sql, new { Id = Id });
@@ -78,12 +78,12 @@ namespace MeninoDev.Controllers
 
             if (form.Id > 0)
             {
-                using (IDbConnection db = new SqlConnection(_connectionString))
+                using (IDbConnection db = new MySqlConnection(_connectionString))
                 {
-                    var sql = @"UPDATE CATEGORY SET Date = @Date, Name = @Name OUTPUT INSERTED.* WHERE Id = @Id";
+                    var sql = @"UPDATE Category SET Date = @Date, Name = @Name WHERE Id = @Id";
                     form.Date = DateTime.Today;
 
-                    var retorno = db.QuerySingle<Categoria>(sql, new
+                    var retorno = db.QuerySingleOrDefault<Categoria>(sql, new
                     {
                         form.Date,
                         form.Name,
@@ -96,12 +96,12 @@ namespace MeninoDev.Controllers
             else
             {
 
-                using (IDbConnection db = new SqlConnection(_connectionString))
+                using (IDbConnection db = new MySqlConnection(_connectionString))
                 {
-                    var sql = @"INSERT CATEGORY (Name, Date) OUTPUT INSERTED.* VALUES (@Name, @Date)";
+                    var sql = @"INSERT Category (Name, Date) VALUES (@Name, @Date)";
                     form.Date = DateTime.Today;
 
-                    var retorno = db.QuerySingle<Categoria>(sql, new
+                    var retorno = db.QuerySingleOrDefault<Categoria>(sql, new
                     {
                         form.Date,
                         form.Name
@@ -110,25 +110,22 @@ namespace MeninoDev.Controllers
 
                 TempData["Sucesso"] = "Post salvo com sucesso!";
             }
-
-
+            
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Delete(long Id)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sql = "DELETE FROM CATEGORY WHERE Id = @Id";
+                var sql = "DELETE FROM Category WHERE Id = @Id";
 
-                db.Query(sql, new { Id = Id });
+                db.Query(sql, new { Id });
             }
 
             TempData["Exclusao"] = "Categoria removida com sucesso!";
 
             return RedirectToAction("Index");
         }
-
-        
     }
 }

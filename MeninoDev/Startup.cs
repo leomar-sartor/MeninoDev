@@ -1,4 +1,6 @@
+using Google.Protobuf.WellKnownTypes;
 using MeninoDev.Contexto;
+using MeninoDev.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,9 +28,12 @@ namespace MeninoDev
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var con = Configuration.GetConnectionString("database");
+            var version = ServerVersion.AutoDetect(Configuration.GetConnectionString("database"));
+
             services.AddDbContext<Context>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("database")));
+                options.UseMySql(con, version));
+
 
             services.AddDefaultIdentity<UserApp>
                (options =>
@@ -41,6 +46,8 @@ namespace MeninoDev
                .AddRoles<IdentityRole>()
                .AddEntityFrameworkStores<Context>();
 
+            services.AddTransient<ICategoriaService, CategoriaService>();
+
             services.AddControllersWithViews();
             services.AddRazorPages();
 
@@ -52,28 +59,28 @@ namespace MeninoDev
                     options.ClientId = googleAuthNSection["ClientId"];
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
                 });
-               // .AddFacebook(opt =>
-               // {
-               //     IConfigurationSection googleAuthNSection =
-               //         Configuration.GetSection("Authentication:Facebook");
-               //     opt.ClientId = googleAuthNSection["AppId"];
-               //     opt.ClientSecret = googleAuthNSection["AppSecret"];
-               // })
-               // .AddMicrosoftAccount(microsoftOptions =>
-               // {
-               //     IConfigurationSection googleAuthMsft =
-               //         Configuration.GetSection("Authentication:Microsoft");
-               //     microsoftOptions.ClientId = googleAuthMsft["AppId"];
-               //     microsoftOptions.ClientSecret = googleAuthMsft["AppSecret"];
-               // })
-               //.AddTwitter(twitterOptions =>
-               //{
-               //    IConfigurationSection googleAuthTwt =
-               //         Configuration.GetSection("Authentication:Twiter");
-               //    twitterOptions.ConsumerKey = googleAuthTwt["AppId"];
-               //    twitterOptions.ConsumerSecret = googleAuthTwt["AppSecret"];
-               //    twitterOptions.RetrieveUserDetails = true;
-               //});
+            // .AddFacebook(opt =>
+            // {
+            //     IConfigurationSection googleAuthNSection =
+            //         Configuration.GetSection("Authentication:Facebook");
+            //     opt.ClientId = googleAuthNSection["AppId"];
+            //     opt.ClientSecret = googleAuthNSection["AppSecret"];
+            // })
+            // .AddMicrosoftAccount(microsoftOptions =>
+            // {
+            //     IConfigurationSection googleAuthMsft =
+            //         Configuration.GetSection("Authentication:Microsoft");
+            //     microsoftOptions.ClientId = googleAuthMsft["AppId"];
+            //     microsoftOptions.ClientSecret = googleAuthMsft["AppSecret"];
+            // })
+            //.AddTwitter(twitterOptions =>
+            //{
+            //    IConfigurationSection googleAuthTwt =
+            //         Configuration.GetSection("Authentication:Twiter");
+            //    twitterOptions.ConsumerKey = googleAuthTwt["AppId"];
+            //    twitterOptions.ConsumerSecret = googleAuthTwt["AppSecret"];
+            //    twitterOptions.RetrieveUserDetails = true;
+            //});
 
             //.AddFacebook(facebookOptions =>
             //{
@@ -101,7 +108,6 @@ namespace MeninoDev
             //{
             //    options.AddPolicy("AdminRolePolicy", policy => policy.RequireRole("Admin"));
             //});
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -109,7 +115,7 @@ namespace MeninoDev
         {
             //if (env.IsDevelopment())
             //{
-                app.UseDeveloperExceptionPage();
+            app.UseDeveloperExceptionPage();
             //}
             //else
             //{
@@ -117,6 +123,7 @@ namespace MeninoDev
             //    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             //    app.UseHsts();
             //}
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -125,8 +132,6 @@ namespace MeninoDev
             app.UseAuthentication();
             app.UseAuthorization();
 
-           
-            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -135,7 +140,7 @@ namespace MeninoDev
 
                 endpoints.MapRazorPages();
             });
-
+            
             //app.UseMvc();
         }
     }

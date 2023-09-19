@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web.Mvc;
+//using System.Web.Mvc;
 
 namespace MeninoDev.Entidades
 {
@@ -21,19 +21,23 @@ namespace MeninoDev.Entidades
         [Display(Name = "Título")]
         public string Title { get; set; }
 
-        //[Required(ErrorMessage = "É necessário uma imagem")]
-        //[Display(Name = "Imagem")]
-        //public IFormFile Imagem { get; set; }
 
-        [AllowHtml]
+        [Required(ErrorMessage = "É necessário um título")]
+        [Display(Name = "Descrição")]
+        public string Descricao { get; set; }
+
+        [Display(Name = "Categoria")]
+        public long CategoriaId { get; set; }
+
+        //[AllowHtml]
+        //[DataType(DataType.MultilineText)]
+        [DisplayFormat(HtmlEncode = true)]
         [Display(Name = "Conteúdo")]
         public string Content { get; set; }
 
         [Display(Name = "Imagem")]
         public string Url { get; set; }
 
-        //public string searchString { get; set; }
-        
         public long PostPage { get; set; }
 
         public List<Comment> Comments { get; set; }

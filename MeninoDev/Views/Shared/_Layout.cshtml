@@ -1,16 +1,21 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using MeninoDev.Entidades;
+@using MeninoDev.Services;
+@using Microsoft.AspNetCore.Identity
 @using MeninoDev.Contexto
 @using System.Security.Claims;
+@inject ICategoriaService _service
 
 @inject SignInManager<UserApp> SignInManager
 @inject UserManager<UserApp> UserManager
 
-    @{
+@{
     var IdUser = User.FindFirst(ClaimTypes.NameIdentifier);
 
     UserApp user = new UserApp();
     if (IdUser != null)
         user = await UserManager.FindByIdAsync(IdUser.Value);
+
+    List<Categoria> _categorias = _service.BuscarTodas().ToList();
 }
 
 
@@ -57,35 +62,49 @@
                             YouCode
                         </a>
                     </li>
-                    <li><a href="#" class="nav-link px-2 link-dark">React Native</a></li>
-                    <li><a href="#" class="nav-link px-2 link-dark">NestJs</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle px-2 link-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Mais Categorias
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Sql Server</a></li>
-                            <li><a class="dropdown-item" href="#">Ferramentas</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Geral</a></li>
-                        </ul>
-                    </li>
-                </ul>
 
-                @*<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" asp-action="Index" asp-controller="Post">
-                    <input name="searchString" type="search" class="form-control" placeholder="Buscar..." aria-label="Buscar">
-                    </form>*@
-
-                @*                @using (Html.BeginForm())
+                    @for (int i = 0; i < _categorias.Count; i++)
                     {
-                    <p>
-                    Find by name: @Html.TextBox("SearchString")
-                    <input type="submit" value="Search" /></p>
+                        if (i == 0 || i == 1)
+                        {
+                            <li>
+                                <a asp-asp-controller="Post"
+                                   asp-action="Index"
+                                   asp-route-categoriaId="@_categorias[i].Id"
+                                   class="nav-link px-2 link-dark">
+                                    @_categorias[i].Name
+                                </a>
+                            </li>
+                        }
+
+                        if (i >= 2 )
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle pl-2 link-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Mais Categorias
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                    @for (int j = 2; j < _categorias.Count; j++)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item text-center" href="#"></a>
+
+                                            <a asp-asp-controller="Post"
+                                               asp-action="Index"
+                                               asp-route-categoriaId="@_categorias[j].Id"
+                                               class="dropdown-item text-center"
+                                               >
+                                                @_categorias[j].Name
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                            break;
+                        }
                     }
-                *@
-                @* <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button id="logout" type="submit" class="nav-link btn btn-link text-dark"><span style="color: Dodgerblue;"><i class="fa-solid fa-right-from-bracket"></i></span></button>
-                    </form>*@
+                </ul>
 
                 <div class="dropdown text-end">
                     @if (SignInManager.IsSignedIn(User))
@@ -105,7 +124,6 @@
 
                             @if (User.IsInRole("Admin"))
                             {
-                                @*<li><a class="dropdown-item text-center"  asp-controller="Post" asp-action="Form">Posts</a></li>*@
                                 <li><a class="dropdown-item text-center" asp-controller="Administrador" asp-action="ListUsers">Usuários</a></li>
                                 <li><a class="dropdown-item text-center" asp-controller="Categoria" asp-action="Index">Categorias</a></li>
                             }
@@ -143,7 +161,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container text-center">
-            &copy; 2022 - YouCode - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2022 - YouCode
         </div>
     </footer>
 

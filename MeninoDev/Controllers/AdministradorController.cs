@@ -303,7 +303,8 @@ namespace MeninoDev.Controllers
                 return View("NotFound");
             }
             var model = new List<UserRolesViewModel>();
-            foreach (var role in _roleManager.Roles)
+            var roles = _roleManager.Roles.ToList();
+            foreach (var role in roles)
             {
                 var userRolesViewModel = new UserRolesViewModel
                 {

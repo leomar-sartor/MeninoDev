@@ -14,9 +14,12 @@ using System.Data;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
+using MySql.Data.MySqlClient;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MeninoDev.Controllers
 {
+    [Authorize]
     public class PerfilController : Controller
     {
         public IConfiguration _configuration { get; }
@@ -58,9 +61,9 @@ namespace MeninoDev.Controllers
                 return View(form);
 
             var IdUser = User.FindFirst(ClaimTypes.NameIdentifier);
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sql = @"UPDATE AspNetUsers SET Apelido = @Apelido OUTPUT INSERTED.* WHERE Id = @Id";
+                var sql = @"UPDATE AspNetUsers SET Apelido = @Apelido WHERE Id = @Id";
 
                 db.Execute(sql, new
                 {
@@ -108,9 +111,9 @@ namespace MeninoDev.Controllers
                 }
 
                 var IdUser = User.FindFirst(ClaimTypes.NameIdentifier);
-                using (IDbConnection db = new SqlConnection(_connectionString))
+                using (IDbConnection db = new MySqlConnection(_connectionString))
                 {
-                    var sql = @"UPDATE AspNetUsers SET UrlFoto = @UrlFoto OUTPUT INSERTED.* WHERE Id = @Id";
+                    var sql = @"UPDATE AspNetUsers SET UrlFoto = @UrlFoto WHERE Id = @Id";
 
                     db.Execute(sql, new
                     {
@@ -126,9 +129,9 @@ namespace MeninoDev.Controllers
         public async Task<IActionResult> FotoRemove()
         {
             var IdUser = User.FindFirst(ClaimTypes.NameIdentifier);
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sql = @"UPDATE AspNetUsers SET UrlFoto = @UrlFoto OUTPUT INSERTED.* WHERE Id = @Id";
+                var sql = @"UPDATE AspNetUsers SET UrlFoto = @UrlFoto WHERE Id = @Id";
 
                 db.Execute(sql, new
                 {

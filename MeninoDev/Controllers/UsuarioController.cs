@@ -1,5 +1,6 @@
 ﻿using MeninoDev.Contexto;
 using MeninoDev.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Security.Claims;
 
 namespace MeninoDev.Controllers
 {
+    [Authorize]
     public class UsuarioController : Controller
     {
         private readonly UserManager<UserApp> _userManager;
@@ -39,19 +41,10 @@ namespace MeninoDev.Controllers
                 user.Origem = "";
 
                 var dados = User as ClaimsPrincipal;
-                
-
-                
                 //user.Claims
-
             }
-
             //Claim claim = new Claim("", "", ClaimValueTypes.String);
             //IdentityRole role = new IdentityRole("");
-
-
-
-
 
             return View(users);
         }

@@ -9,9 +9,12 @@ using System.Collections.Generic;
 using System.Linq;
 using X.PagedList;
 using Microsoft.AspNetCore.Authorization;
+using MySql.Data.MySqlClient;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MeninoDev.Controllers
 {
+    [Authorize]
     public class PostController : Controller
     {
         public IConfiguration _configuration { get; }
@@ -21,9 +24,9 @@ namespace MeninoDev.Controllers
         {
             _connectionString = configuration.GetConnectionString("database");
         }
-
+        
         [AllowAnonymous]
-        public IActionResult Index(string searchString, int? pageNumber = 1)
+        public IActionResult Index(string searchString, int? pageNumber = 1, long? categoriaId = null)
         {
             if (pageNumber == 0)
                 pageNumber = 1;
@@ -34,20 +37,24 @@ namespace MeninoDev.Controllers
 
             IEnumerable<Post> posts;
 
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sql = "SELECT * FROM POST";
+                var sql = "SELECT * FROM Post";
+
+                if(categoriaId > 0)
+                {
+                    sql = sql + @$" WHERE CategoriaId = {categoriaId}";
+                }
 
                 if (!String.IsNullOrEmpty(searchString))
                 {
-                    sql = sql + @$" WHERE Title like '%{searchString}%'";
+                    sql = sql + @$" AND Title like '%{searchString}%'";
                 }
 
                 posts = db.Query<Post>(sql);
             }
 
             int pageSize = 6;
-            //var postes = PaginatedList<Post>.Create(posts.OrderByDescending(m => m.Date), pageNumber ?? 1, pageSize);
 
             var retorno = posts.OrderByDescending(m => m.Date).ToPagedList((int)pageNumber, 6);
 
@@ -57,11 +64,25 @@ namespace MeninoDev.Controllers
 
         public IActionResult Form(long Id)
         {
+            using (IDbConnection db = new MySqlConnection(_connectionString))
+            {
+                var sqlCategorias = "SELECT * FROM Category";
+                var Categorias = db.Query<Categoria>(sqlCategorias);
+
+                var itens = Categorias.Select(m => new SelectListItem()
+                {
+                    Value = m.Id.ToString(),
+                    Text = m.Name
+                }).ToList();
+
+                @ViewBag.Categorias = itens;
+            }
+
             if (Id > 0)
             {
-                using (IDbConnection db = new SqlConnection(_connectionString))
+                using (IDbConnection db = new MySqlConnection(_connectionString))
                 {
-                    var sqlPost = "SELECT * FROM POST WHERE Id = @PostId";
+                    var sqlPost = "SELECT * FROM Post WHERE Id = @PostId";
                     var Post = db.QueryFirstOrDefault<Post>(sqlPost, new { PostId = Id });
 
                     return View(Post);
@@ -77,31 +98,37 @@ namespace MeninoDev.Controllers
             if (!ModelState.IsValid)
             {
                 TempData["Error"] = "Dados Inválidos!";
+
+                using (IDbConnection db = new MySqlConnection(_connectionString))
+                {
+                    var sqlCategorias = "SELECT * FROM Category";
+                    var Categorias = db.Query<Categoria>(sqlCategorias);
+
+                    var itens = Categorias.Select(m => new SelectListItem()
+                    {
+                        Value = m.Id.ToString(),
+                        Text = m.Name
+                    }).ToList();
+
+                    @ViewBag.Categorias = itens;
+                }
+
                 return View();
             }
 
-            //if (post.Imagem != null)
-            //{
-                //string pastaFotos = Path.Combine(webHostEnvironment.WebRootPath, "Imagens");
-                //nomeUnicoArquivo = Guid.NewGuid().ToString() + "_" + model.Foto.FileName;
-                //string caminhoArquivo = Path.Combine(pastaFotos, nomeUnicoArquivo);
-                //using (var fileStream = new FileStream(caminhoArquivo, FileMode.Create))
-                //{
-                //    model.Foto.CopyTo(fileStream);
-                //}
-            //}
-
             if (post.Id > 0)
             {
-                using (IDbConnection db = new SqlConnection(_connectionString))
+                using (IDbConnection db = new MySqlConnection(_connectionString))
                 {
-                    var sql = @"UPDATE POST SET Date = @Date, Title = @Title, Content = @Content, Url = @Url OUTPUT INSERTED.* WHERE Id = @Id";
+                    var sql = @"UPDATE Post SET Date = @Date, Title = @Title, Descricao = @Descricao, CategoriaId = @CategoriaId, Content = @Content, Url = @Url WHERE Id = @Id";
                     post.Date = DateTime.Today;
 
-                    var retorno = db.QuerySingle<Post>(sql, new
+                    var retorno = db.QuerySingleOrDefault<Post>(sql, new
                     {
                         post.Date,
                         post.Title,
+                        post.Descricao,
+                        post.CategoriaId,
                         post.Content,
                         post.Url,
                         post.Id
@@ -113,15 +140,17 @@ namespace MeninoDev.Controllers
             else
             {
 
-                using (IDbConnection db = new SqlConnection(_connectionString))
+                using (IDbConnection db = new MySqlConnection(_connectionString))
                 {
-                    var sql = @"INSERT POST (Date, Title, Content, Url) OUTPUT INSERTED.* VALUES (@Date, @Title, @Content, @Url)";
+                    var sql = @"INSERT INTO Post (Date, Title, Descricao, CategoriaId, Content, Url) VALUES (@Date, @Title, @Descricao,  @CategoriaId, @Content, @Url)";
                     post.Date = DateTime.Today;
 
-                    var retorno = db.QuerySingle<Post>(sql, new
+                    var retorno = db.QuerySingleOrDefault<Post>(sql, new
                     {
                         post.Date,
                         post.Title,
+                        post.Descricao,
+                        post.CategoriaId,
                         post.Content,
                         post.Url
                     });
@@ -135,9 +164,9 @@ namespace MeninoDev.Controllers
 
         public ActionResult Delete(long Id)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sql = "DELETE FROM POST WHERE Id = @PostId";
+                var sql = "DELETE FROM Post WHERE Id = @PostId";
 
                 db.Query(sql, new { PostId = Id });
             }
@@ -150,13 +179,13 @@ namespace MeninoDev.Controllers
 
         public IActionResult Read(long Id, long Page = 0)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new MySqlConnection(_connectionString))
             {
-                var sqlPost = "SELECT * FROM POST WHERE Id = @PostId";
+                var sqlPost = "SELECT * FROM Post WHERE Id = @PostId";
                 var Post = db.QueryFirstOrDefault<Post>(sqlPost, new { PostId = Id });
 
                 var sqlComments = @$"
-                                    SELECT C.*, U.UserName as CommentUser FROM COMMENT C 
+                                    SELECT C.*, U.UserName as CommentUser FROM Comment C 
                                     INNER JOIN AspNetUsers U ON U.Id = C.UserId
                                     WHERE PostId = @PostId and CommentId = 0";
                 var comments = db.Query<Comment>(sqlComments, new { PostId = Id }).ToList();
@@ -164,7 +193,7 @@ namespace MeninoDev.Controllers
 
                 foreach (var cm in comments)
                 {
-                    var sqlSubComments = @$"SELECT C.*, U.UserName as CommentUser FROM COMMENT C 
+                    var sqlSubComments = @$"SELECT C.*, U.UserName as CommentUser FROM Comment C 
                                     INNER JOIN AspNetUsers U ON U.Id = C.UserId
                                     WHERE CommentId = @CommentId";
                     var subcomments = db.Query<Comment>(sqlSubComments, new { CommentId = cm.Id }).ToList();

@@ -28,14 +28,6 @@
     </div>
 </div>
 
-@*@using (Html.BeginForm())
-{
-    <p>
-        Find by name: @Html.TextBox("SearchString")
-        <input type="submit" value="Search" />
-    </p>
-}*@
-
 <form class="form-inline my-2 my-lg-0">
     <div class="input-group">
         <input name="searchString" value="@ViewBag.SearchString" type="text" class="form-control" placeholder="Encontrar" aria-label="Recipient's username" aria-describedby="basic-addon2">
@@ -58,7 +50,7 @@
                 <img width="100%" height="225" background="#55595c" color="#eceeef" class="card-img-top" text="Thumbnail" src=@url />
 
                 <div class="card-body">
-                    <p class="card-text fw-bold" style="text-align: justify !important;">
+                    <p class="card-text fw-bold" style="text-align: justify !important; text-transform: uppercase;">
                         @{
                             if (item.Title.Length > 70)
                             {
@@ -73,6 +65,23 @@
                             }
                         }
                     </p>
+
+                    <p class="card-text" style="text-align: justify !important; font-size: 0.8em;">
+                        @{
+                            if (item.Descricao.Length > 70)
+                            {
+                                var tam = item.Descricao.Length;
+                                var res = item.Descricao.Remove(70, item.Descricao.Length - 70);
+                                res = res + "...";
+                                @res
+                            }
+                            else
+                            {
+                                @item.Descricao
+                            }
+                        }
+                    </p>
+
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <small class="text-muted right">
