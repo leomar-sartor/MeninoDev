@@ -21,6 +21,28 @@ namespace MeninoDev.Controllers
             return RedirectToAction("index", "Post");
         }
 
+        [AllowAnonymous]
+        public IActionResult PoliticaEPrivacidade()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult TermosDeUso()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult TesteErro()
+        {
+            long acima = 100;
+            long abaixo = 0;
+            var resultado = acima / abaixo;
+
+            return RedirectToAction("index", "Post");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

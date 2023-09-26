@@ -176,7 +176,7 @@ namespace MeninoDev.Controllers
             return RedirectToAction("Index");
         }
 
-
+        [AllowAnonymous]
         public IActionResult Read(long Id, long Page = 0)
         {
             using (IDbConnection db = new MySqlConnection(_connectionString))

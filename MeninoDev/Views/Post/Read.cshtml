@@ -11,7 +11,7 @@
     ViewData["Title"] = "Leitura";
 
     var mostrar = (SignInManager.IsSignedIn(User));
-    var IdUser = User.Claims.FirstOrDefault().Value;
+    var IdUser = User.Claims.FirstOrDefault()?.Value?? null;
 
     var UserId = User.FindFirst(ClaimTypes.NameIdentifier);
     UserApp user = new UserApp();
