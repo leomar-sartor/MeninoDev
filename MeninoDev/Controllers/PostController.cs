@@ -41,14 +41,19 @@ namespace MeninoDev.Controllers
             {
                 var sql = "SELECT * FROM Post";
 
+                var entrou = false;
                 if(categoriaId > 0)
                 {
+                    entrou = true;
                     sql = sql + @$" WHERE CategoriaId = {categoriaId}";
                 }
 
                 if (!String.IsNullOrEmpty(searchString))
                 {
-                    sql = sql + @$" AND Title like '%{searchString}%'";
+                    if(entrou)
+                        sql = sql + @$" AND Title LIKE  '%{searchString}%'";
+                    else
+                        sql = sql + @$" WHERE Title LIKE  '%{searchString}%'";
                 }
 
                 posts = db.Query<Post>(sql);
@@ -129,7 +134,7 @@ namespace MeninoDev.Controllers
                         post.Title,
                         post.Descricao,
                         post.CategoriaId,
-                        post.Content,
+                        Content = post.Content ?? "",
                         post.Url,
                         post.Id
                     });
@@ -151,7 +156,7 @@ namespace MeninoDev.Controllers
                         post.Title,
                         post.Descricao,
                         post.CategoriaId,
-                        post.Content,
+                        Content = post.Content ?? "",
                         post.Url
                     });
                 }

@@ -21,7 +21,7 @@
     <div class="col-4 text-center">
         @if (mostrar)
         {
-            @Html.ActionLink("Novo", "Form", "Post", null, "", null, null, new { @class = "btn btn-sm btn-outline-success mb-2"})
+            @Html.ActionLink("Novo", "Form", "Post", null, "", null, null, new { @class = "btn btn-sm btn-outline-success mb-3"})
         }
     </div>
     <div class="col-4">
@@ -37,19 +37,19 @@
     </div>
 </form>
 
-<div class="row pt-3">
+<div class="row">
     @foreach (var item in Model.OrderByDescending(m => m.Id))
     {
         cont = cont + 1;
         var url = item.Url ?? "https://kinsta.com/pt/wp-content/uploads/sites/3/2020/04/ferramentas-de-revisao-de-codigo-1024x512.png";
 
         @*h-100*@
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
+        <div class="col-md-4 pt-3">
+            <div class="card mb-4 shadow-sm h-100">
 
                 <img width="100%" height="225" background="#55595c" color="#eceeef" class="card-img-top" text="Thumbnail" src=@url />
 
-                <div class="card-body">
+                <div class="card-body pb-0">
                     <p class="card-text fw-bold" style="text-align: justify !important; text-transform: uppercase;">
                         @{
                             if (item.Title.Length > 70)
@@ -82,7 +82,7 @@
                         }
                     </p>
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-end align-items-end">
                         <div>
                             <small class="text-muted right">
                                 @item.Date.ToString("dd/MM/yyyy")
@@ -96,7 +96,7 @@
                                 <a asp-controller="Post"
                            asp-action="Form"
                            asp-route-id="@item.Id"
-                           class="btn btn-sm btn-outline-warning"
+                           class="btn btn-sm btn-outline-warning ms-3"
                            role="button">
                                     Editar
                                 </a>
@@ -121,13 +121,13 @@
     }
 </div>
 
-<div class="text-center mb-2">
+<div class="text-center mb-2 pt-2">
 <p>Página @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount</p>
 </div>
 
 
 
-<nav aria-label="Page navigation example">
+<nav aria-label="Page navigation example pt-2">
     @Html.PagedListPager(
     Model,
     page => Url.Action("Index", new { pageNumber = page, searchString = @ViewBag.SearchString?? "" }),

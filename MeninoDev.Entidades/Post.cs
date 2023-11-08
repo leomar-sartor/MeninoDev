@@ -33,7 +33,7 @@ namespace MeninoDev.Entidades
         //[DataType(DataType.MultilineText)]
         [DisplayFormat(HtmlEncode = true)]
         [Display(Name = "Conteúdo")]
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         [Display(Name = "Imagem")]
         public string Url { get; set; }
